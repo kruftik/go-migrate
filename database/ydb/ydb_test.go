@@ -16,7 +16,6 @@ import (
 
 	"github.com/dhui/dktest"
 
-	"github.com/golang-migrate/migrate/v4/database"
 	dt "github.com/golang-migrate/migrate/v4/database/testing"
 	"github.com/golang-migrate/migrate/v4/dktesting"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -38,7 +37,6 @@ var (
 )
 
 func ydbConnectionString(host, port string, options ...string) string {
-	options = append(options, "sslmode=disable")
 	return fmt.Sprintf("grpcs://%s:%s/?%s", host, port, strings.Join(options, "&"))
 }
 
@@ -48,7 +46,7 @@ func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
 		return false
 	}
 
-	db, err := sql.Open("ydb", ydbConnectionString(ip, port))
+	db, err := sql.Open("ydb", ydbConnectionString(ip, port, "database=/local"))
 	if err != nil {
 		return false
 	}
@@ -70,14 +68,6 @@ func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
 	return true
 }
 
-func mustRun(t *testing.T, d database.Driver, statements []string) {
-	for _, statement := range statements {
-		if err := d.Run(strings.NewReader(statement)); err != nil {
-			t.Fatal(err)
-		}
-	}
-}
-
 func Test(t *testing.T) {
 	dktesting.ParallelTest(t, specs, func(t *testing.T, c dktest.ContainerInfo) {
 		ip, port, err := c.FirstPort()
@@ -85,7 +75,7 @@ func Test(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		addr := ydbConnectionString(ip, port)
+		addr := ydbConnectionString(ip, port, "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
@@ -107,7 +97,7 @@ func TestMigrate(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		addr := ydbConnectionString(ip, port)
+		addr := ydbConnectionString(ip, port, "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
@@ -133,7 +123,7 @@ func TestMultipleStatements(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		addr := ydbConnectionString(ip, port)
+		addr := ydbConnectionString(ip, port, "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
