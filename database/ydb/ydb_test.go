@@ -17,7 +17,6 @@ import (
 	"github.com/dhui/dktest"
 
 	dt "github.com/golang-migrate/migrate/v4/database/testing"
-	"github.com/golang-migrate/migrate/v4/dktesting"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
@@ -31,9 +30,7 @@ var (
 		ReadyFunc:    isReady,
 	}
 
-	specs = []dktesting.ContainerSpec{
-		{ImageName: "cr.yandex/yc/yandex-docker-local-ydb:latest", Options: opts},
-	}
+	image = "cr.yandex/yc/yandex-docker-local-ydb:latest"
 )
 
 func ydbConnectionString(host, port string, options ...string) string {
@@ -69,7 +66,7 @@ func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
 }
 
 func Test(t *testing.T) {
-	dktesting.ParallelTest(t, specs, func(t *testing.T, c dktest.ContainerInfo) {
+	dktest.Run(t, image, opts,  func(t *testing.T, c dktest.ContainerInfo) {
 		ip, port, err := c.FirstPort()
 		if err != nil {
 			t.Fatal(err)
@@ -91,7 +88,7 @@ func Test(t *testing.T) {
 }
 
 func TestMigrate(t *testing.T) {
-	dktesting.ParallelTest(t, specs, func(t *testing.T, c dktest.ContainerInfo) {
+	dktest.Run(t, image, opts,  func(t *testing.T, c dktest.ContainerInfo) {
 		ip, port, err := c.FirstPort()
 		if err != nil {
 			t.Fatal(err)
@@ -117,7 +114,7 @@ func TestMigrate(t *testing.T) {
 }
 
 func TestMultipleStatements(t *testing.T) {
-	dktesting.ParallelTest(t, specs, func(t *testing.T, c dktest.ContainerInfo) {
+	dktest.Run(t, image, opts,  func(t *testing.T, c dktest.ContainerInfo) {
 		ip, port, err := c.FirstPort()
 		if err != nil {
 			t.Fatal(err)
