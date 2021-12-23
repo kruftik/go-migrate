@@ -128,8 +128,16 @@ func (db *YDB) execMigration(migration string) error {
 
 	ctx := context.Background()
 	tmu := strings.ToUpper(tm)
-	if strings.HasPrefix(tmu, "CREATE") || strings.HasPrefix(tmu, "ALTER") || strings.HasPrefix(tmu, "DROP") {
-		ctx = ydbsql.WithSchemeQuery(ctx)
+	for _, line := range strings.Split(tmu, "\n") {
+		if strings.HasPrefix(strings.TrimSpace(line), "--") {
+			continue
+		}
+
+		if strings.HasPrefix(line, "CREATE") || strings.HasPrefix(line, "ALTER") || strings.HasPrefix(line, "DROP") {
+			ctx = ydbsql.WithSchemeQuery(ctx)
+		}
+
+		break
 	}
 
 	_, err := db.conn.ExecContext(ctx, migration)
@@ -170,10 +178,14 @@ func (db *YDB) Version() (int, bool, error) {
 		dirty    bool
 		query    = "SELECT sequence, version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
 	)
-	if err := db.conn.QueryRow(query).Scan(&sequence, &version, &dirty); err != nil {
-		if err == sql.ErrNoRows {
-			return database.NilVersion, false, nil
-		}
+	res, err := db.conn.Query(query)
+	if err != nil {
+		return 0, false, &database.Error{OrigErr: err, Query: []byte(query)}
+	}
+	if !res.NextResultSet() || !res.Next() {
+		return database.NilVersion, false, nil
+	}
+	if err = res.Scan(&sequence, &version, &dirty); err != nil {
 		return 0, false, &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 	return int(version), dirty, nil
@@ -209,10 +221,15 @@ func (db *YDB) migrationTableExists() error {
 		query = "SELECT DISTINCT Path FROM `.sys/partition_stats` WHERE Path LIKE '" + db.config.MigrationsTable + "'"
 	)
 
-	if err := db.conn.QueryRowContext(ydbsql.WithScanQuery(context.Background()), query).Scan(&table); err != nil {
-		if err != sql.ErrNoRows {
-			return &database.Error{OrigErr: err, Query: []byte(query)}
-		}
+	res, err := db.conn.QueryContext(ydbsql.WithScanQuery(context.Background()), query)
+	if err != nil {
+		return &database.Error{OrigErr: err, Query: []byte(query)}
+	}
+	if !res.NextResultSet() || !res.Next() {
+		return &database.Error{OrigErr: err, Query: []byte(query)}
+	}
+	if err = res.Scan(&table); err != nil {
+		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
 	return nil
@@ -236,8 +253,8 @@ func (db *YDB) ensureVersionTable() (err error) {
 		}
 	}()
 
-	if err := db.migrationTableExists(); err != nil {
-		return err
+	if err := db.migrationTableExists(); err == nil {
+		return nil
 	}
 
 	// if not, create the empty migration table
