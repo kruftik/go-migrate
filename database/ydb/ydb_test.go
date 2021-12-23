@@ -28,7 +28,8 @@ var (
 	certsDirectory = "/tmp/ydb_certs"
 
 	opts = dktest.Options{
-		Timeout: 3 * time.Minute,
+		Hostname: "localhost",
+		Timeout:  3 * time.Minute,
 		Env: map[string]string{
 			"YDB_USE_IN_MEMORY_PDISKS": "true",
 		},
@@ -61,7 +62,7 @@ func ydbConnectionString(host, port string, options ...string) string {
 }
 
 func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
-	db, err := sql.Open("ydb", ydbConnectionString("0.0.0.0", "2135", "database=/local"))
+	db, err := sql.Open("ydb", ydbConnectionString("localhost", "2135", "database=/local"))
 	if err != nil {
 		return false
 	}
@@ -85,7 +86,7 @@ func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
 
 func Test(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		addr := ydbConnectionString("0.0.0.0", "2135", "database=/local")
+		addr := ydbConnectionString("localhost", "2135", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
@@ -102,7 +103,7 @@ func Test(t *testing.T) {
 
 func TestMigrate(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		addr := ydbConnectionString("0.0.0.0", "2135", "database=/local")
+		addr := ydbConnectionString("localhost", "2135", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
@@ -123,7 +124,7 @@ func TestMigrate(t *testing.T) {
 
 func TestMultipleStatements(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		addr := ydbConnectionString("0.0.0.0", "2135", "database=/local")
+		addr := ydbConnectionString("localhost", "2135", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
