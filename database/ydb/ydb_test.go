@@ -13,6 +13,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
@@ -27,6 +28,7 @@ var (
 	certsDirectory = "/tmp/ydb_certs"
 
 	opts = dktest.Options{
+		ReadyTimeout: 5 * time.Minute,
 		Env: map[string]string{
 			"YDB_USE_IN_MEMORY_PDISKS": "true",
 		},

@@ -72,8 +72,8 @@ func (db *YDB) Open(dsn string) (database.Driver, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	q := migrate.FilterCustomQuery(purl)
-	q.Scheme = "tcp"
 	conn, err := sql.Open("ydb", q.String())
 	if err != nil {
 		return nil, err
