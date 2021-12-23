@@ -52,7 +52,6 @@ require (
 	github.com/snowflakedb/gosnowflake v1.6.3
 	github.com/stretchr/testify v1.7.0
 	github.com/xanzy/go-gitlab v0.15.0
-	github.com/ydb-platform/ydb-go-sdk/v3 v3.5.0-rc0 // indirect
 	github.com/ydb-platform/ydb-go-sql v0.0.1-alpha
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mongodb.org/mongo-driver v1.7.0
