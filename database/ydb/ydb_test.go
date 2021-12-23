@@ -145,7 +145,7 @@ func TestMultipleStatements(t *testing.T) {
 				t.Error(err)
 			}
 		}()
-		if err := d.Run(strings.NewReader("CREATE TABLE foo (foo Utf8 PRIMARY KEY(foo)); CREATE TABLE bar (bar Utf8 PRIMARY KEY(bar));")); err != nil {
+		if err := d.Run(strings.NewReader("CREATE TABLE foo (foo Utf8, PRIMARY KEY(foo)); CREATE TABLE bar (bar Utf8, PRIMARY KEY(bar));")); err != nil {
 			t.Fatalf("expected err to be nil, got %v", err)
 		}
 

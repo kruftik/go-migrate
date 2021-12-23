@@ -159,11 +159,12 @@ func (db *YDB) Run(r io.Reader) error {
 }
 func (db *YDB) Version() (int, bool, error) {
 	var (
+		sequence uint64,
 		version int
 		dirty   uint8
-		query   = "SELECT version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
+		query   = "SELECT sequence, version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
 	)
-	if err := db.conn.QueryRow(query).Scan(&version, &dirty); err != nil {
+	if err := db.conn.QueryRow(query).Scan(&sequence, &version, &dirty); err != nil {
 		if err == sql.ErrNoRows {
 			return database.NilVersion, false, nil
 		}
@@ -186,8 +187,8 @@ func (db *YDB) SetVersion(version int, dirty bool) error {
 		return err
 	}
 
-	query := "INSERT INTO " + db.config.MigrationsTable + " (version, dirty, sequence) VALUES (?, ?, ?)"
-	if _, err := tx.Exec(query, version, bool(dirty), time.Now().UnixNano()); err != nil {
+	query := "INSERT INTO " + db.config.MigrationsTable + " (sequence, version, dirty) VALUES (?, ?, ?)"
+	if _, err := tx.Exec(query, time.Now().UnixNano(), version, bool(dirty)); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
