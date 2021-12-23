@@ -29,7 +29,6 @@ var (
 
 	opts = dktest.Options{
 		Hostname: "localhost",
-		Timeout:  3 * time.Minute,
 		Env: map[string]string{
 			"YDB_USE_IN_MEMORY_PDISKS": "true",
 		},
