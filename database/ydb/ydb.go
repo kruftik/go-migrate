@@ -115,15 +115,27 @@ func (db *YDB) init() error {
 	return db.ensureVersionTable()
 }
 
+func (db *YDB) execMigration(migration string) error {
+	tm := strings.TrimSpace(migration)
+	if tm == "" {
+		return nil
+	}
+
+	ctx := context.Background()
+	tmu := strings.ToUpper(tm)
+	if strings.HasPrefix(tmu, "CREATE") || strings.HasPrefix(tmu, "ALTER") || strings.HasPrefix(tmu, "DROP") {
+		ctx = ydbsql.WithSchemeQuery(ctx)
+	}
+
+	_, err := db.conn.ExecContext(ctx, migration)
+	return err
+}
+
 func (db *YDB) Run(r io.Reader) error {
 	if db.config.MultiStatementEnabled {
 		var err error
 		if e := multistmt.Parse(r, multiStmtDelimiter, db.config.MultiStatementMaxSize, func(m []byte) bool {
-			tq := strings.TrimSpace(string(m))
-			if tq == "" {
-				return true
-			}
-			if _, e := db.conn.Exec(string(m)); e != nil {
+			if e := db.execMigration(string(m)); e != nil {
 				err = database.Error{OrigErr: e, Err: "migration failed", Query: m}
 				return false
 			}
@@ -139,7 +151,7 @@ func (db *YDB) Run(r io.Reader) error {
 		return err
 	}
 
-	if _, err := db.conn.Exec(string(migration)); err != nil {
+	if err = db.execMigration(string(migration)); err != nil {
 		return database.Error{OrigErr: err, Err: "migration failed", Query: migration}
 	}
 
@@ -257,7 +269,7 @@ func (db *YDB) Drop() (err error) {
 
 		query = "DROP TABLE " + table
 
-		if _, err := db.conn.Exec(query); err != nil {
+		if _, err := db.conn.ExecContext(ydbsql.WithSchemeQuery(context.Background()), query); err != nil {
 			return &database.Error{OrigErr: err, Query: []byte(query)}
 		}
 	}
