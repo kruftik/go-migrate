@@ -186,7 +186,7 @@ func (db *YDB) SetVersion(version int, dirty bool) error {
 	INSERT INTO %s (sequence, version, dirty) VALUES ($sequence, $version, $dirty);
 	`, db.config.MigrationsTable)
 
-	if _, err := tx.Exec(query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
+	if _, err := tx.Exec(query, sql.Named("sequence", uint64(time.Now().UnixNano())), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
