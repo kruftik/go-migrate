@@ -74,6 +74,11 @@ func (db *YDB) Open(dsn string) (database.Driver, error) {
 	}
 
 	q := migrate.FilterCustomQuery(purl)
+	if s := purl.Query().Get("x-use-grpcs-scheme"); len(s) > 0 {
+		q.Scheme = "grpcs"
+	} else {
+		q.Scheme = "grpc"
+	}
 	conn, err := sql.Open("ydb", q.String())
 	if err != nil {
 		return nil, err
@@ -157,6 +162,7 @@ func (db *YDB) Run(r io.Reader) error {
 
 	return nil
 }
+
 func (db *YDB) Version() (int, bool, error) {
 	var (
 		sequence int64
@@ -185,7 +191,7 @@ func (db *YDB) SetVersion(version int, dirty bool) error {
 	DECLARE $sequence AS Int64;
 	DECLARE $version AS Int64;
 	DECLARE $dirty AS Bool;
-	INSERT INTO %s (sequence, version, dirty) VALUES ($sequence, $version, $dirty);
+	UPSERT INTO %s (sequence, version, dirty) VALUES ($sequence, $version, $dirty);
 	`, db.config.MigrationsTable)
 
 	if _, err := tx.Exec(query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {

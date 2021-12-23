@@ -10,6 +10,7 @@
 | `host` | The host to connect to |
 | `port` | The port to bind to |
 | `x-multi-statement` | false | Enable multiple statements to be ran in a single migration (See note below) |
+| `x-use-grpcs-scheme` | false | Enable GRPCS protocol for connecting to YDB |
 
 ## Notes
 
