@@ -19,6 +19,7 @@ require (
 	github.com/denisenkom/go-mssqldb v0.10.0
 	github.com/dhui/dktest v0.3.8
 	github.com/docker/docker v20.10.9+incompatible
+	github.com/docker/go-connections v0.4.0
 	github.com/edsrzf/mmap-go v0.0.0-20170320065105-0bce6a688712 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
@@ -51,7 +52,7 @@ require (
 	github.com/snowflakedb/gosnowflake v1.6.3
 	github.com/stretchr/testify v1.7.0
 	github.com/xanzy/go-gitlab v0.15.0
-	github.com/ydb-platform/ydb-go-sql v0.0.1-alpha // indirect
+	github.com/ydb-platform/ydb-go-sql v0.0.1-alpha
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mongodb.org/mongo-driver v1.7.0
 	go.uber.org/atomic v1.6.0
@@ -77,3 +78,5 @@ require (
 )
 
 go 1.16
+
+replace github.com/dhui/dktest => github.com/floatdrop/dktest v0.3.9-0.20211223111621-6fe2dcb10c97

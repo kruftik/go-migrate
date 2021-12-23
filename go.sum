@@ -344,8 +344,6 @@ github.com/denverdino/aliyungo v0.0.0-20190125010748-a747050bb1ba/go.mod h1:dV8l
 github.com/dgrijalva/jwt-go v0.0.0-20170104182250-a601269ab70c/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
-github.com/dhui/dktest v0.3.8 h1:X6HaIx14Gkuo2d9/k4o6RmeZE/QVE+fvst1mRz+Uj7c=
-github.com/dhui/dktest v0.3.8/go.mod h1:UpB3XEKHXfO6xR9XktKvxDpo6h0hyOuoDK2KoNK04UI=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/docker/distribution v0.0.0-20190905152932-14b96e55d84c/go.mod h1:0+TTO4EOBfRPhZXAeF1Vu+W3hHZ8eLp8PgKVZlcvtFY=
 github.com/docker/distribution v2.7.1-0.20190205005809-0d3efadf0154+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
@@ -387,6 +385,10 @@ github.com/envoyproxy/protoc-gen-validate v0.6.2 h1:JiO+kJTpmYGjEodY7O1Zk8oZcNz1
 github.com/envoyproxy/protoc-gen-validate v0.6.2/go.mod h1:2t7qjJNvHPx8IjnBOzl9E9/baC+qXE/TeeyBRzgJDws=
 github.com/evanphx/json-patch v4.9.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
+github.com/floatdrop/dktest v0.3.9-0.20211223085322-9e06cc559d7f h1:BpSH/QklD1svn6d+1zK3vR9kWFyvDfZSGmBQgobpDzc=
+github.com/floatdrop/dktest v0.3.9-0.20211223085322-9e06cc559d7f/go.mod h1:UpB3XEKHXfO6xR9XktKvxDpo6h0hyOuoDK2KoNK04UI=
+github.com/floatdrop/dktest v0.3.9-0.20211223111621-6fe2dcb10c97 h1:pwcuCzZa/2DIK1GsA39lZq/hY/Ikks397q85+zHAm/g=
+github.com/floatdrop/dktest v0.3.9-0.20211223111621-6fe2dcb10c97/go.mod h1:UpB3XEKHXfO6xR9XktKvxDpo6h0hyOuoDK2KoNK04UI=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fogleman/gg v1.3.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=

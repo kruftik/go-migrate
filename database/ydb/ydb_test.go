@@ -10,19 +10,22 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"testing"
 
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
 	"github.com/golang-migrate/migrate/v4"
 
 	"github.com/dhui/dktest"
-
 	dt "github.com/golang-migrate/migrate/v4/database/testing"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 var (
+	certsDirectory = "/tmp/ydb_certs"
+
 	opts = dktest.Options{
 		Env: map[string]string{
 			"YDB_USE_IN_MEMORY_PDISKS": "true",
@@ -34,14 +37,20 @@ var (
 			}},
 		},
 		ReadyFunc: isReady,
-		Volumes:   []string{"/tmp/ydb_certs:/ydb_certs"},
+		Mounts: []mount.Mount{
+			{
+				Type:   mount.TypeBind,
+				Source: certsDirectory,
+				Target: "/ydb_certs",
+			},
+		},
 	}
 
 	image = "cr.yandex/yc/yandex-docker-local-ydb:latest"
 )
 
 func init() {
-	os.Setenv("YDB_SSL_ROOT_CERTIFICATES_FILE", "/tmp/ydb_certs/ca.pem")
+	os.Setenv("YDB_SSL_ROOT_CERTIFICATES_FILE", path.Join(certsDirectory, "ca.pem"))
 	os.Setenv("YDB_ANONYMOUS_CREDENTIALS", "1")
 }
 
