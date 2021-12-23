@@ -202,7 +202,7 @@ func (db *YDB) migrationTableExists() error {
 		query = "SELECT DISTINCT Path FROM `.sys/partition_stats` WHERE Path LIKE '" + db.config.MigrationsTable + "'"
 	)
 
-	if err := db.conn.QueryRow(query).Scan(&table); err != nil {
+	if err := db.conn.QueryRowContext(ydbsql.WithScanQuery(context.Background()), query).Scan(&table); err != nil {
 		if err != sql.ErrNoRows {
 			return &database.Error{OrigErr: err, Query: []byte(query)}
 		}
@@ -250,7 +250,7 @@ func (db *YDB) ensureVersionTable() (err error) {
 
 func (db *YDB) Drop() (err error) {
 	query := "SELECT DISTINCT Path FROM `.sys/partition_stats`"
-	tables, err := db.conn.Query(query)
+	tables, err := db.conn.QueryContext(ydbsql.WithScanQuery(context.Background()), query)
 
 	if err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
