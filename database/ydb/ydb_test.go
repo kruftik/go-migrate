@@ -21,6 +21,8 @@ import (
 	"github.com/dhui/dktest"
 	dt "github.com/golang-migrate/migrate/v4/database/testing"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	ydbsql "github.com/ydb-platform/ydb-go-sql"
 )
 
 var (
@@ -143,16 +145,13 @@ func TestMultipleStatements(t *testing.T) {
 				t.Error(err)
 			}
 		}()
-		if err := d.Run(strings.NewReader("CREATE TABLE foo (foo text); CREATE TABLE bar (bar text);")); err != nil {
+		if err := d.Run(strings.NewReader("CREATE TABLE foo (foo Utf8); CREATE TABLE bar (bar Utf8);")); err != nil {
 			t.Fatalf("expected err to be nil, got %v", err)
 		}
 
 		// make sure second table exists
-		var exists bool
-		if err := d.(*YDB).conn.QueryRowContext(context.Background(), "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'bar' AND table_schema = (SELECT current_schema()))").Scan(&exists); err != nil {
-			t.Fatal(err)
-		}
-		if !exists {
+		var table string
+		if err := d.(*YDB).conn.QueryRowContext(ydbsql.WithScanQuery(context.Background()), "SELECT DISTINCT Path FROM `.sys/partition_stats` WHERE Path LIKE 'bar'").Scan(&table); err != sql.ErrNoRows {
 			t.Fatalf("expected table bar to exist")
 		}
 	})
