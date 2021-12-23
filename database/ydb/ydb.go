@@ -161,7 +161,7 @@ func (db *YDB) Version() (int, bool, error) {
 	var (
 		sequence uint64
 		version  int64
-		dirty    uint8
+		dirty    bool
 		query    = "SELECT sequence, version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
 	)
 	if err := db.conn.QueryRow(query).Scan(&sequence, &version, &dirty); err != nil {
@@ -170,25 +170,23 @@ func (db *YDB) Version() (int, bool, error) {
 		}
 		return 0, false, &database.Error{OrigErr: err, Query: []byte(query)}
 	}
-	return int(version), dirty == 1, nil
+	return int(version), dirty, nil
 }
 
 func (db *YDB) SetVersion(version int, dirty bool) error {
-	var (
-		bool = func(v bool) uint8 {
-			if v {
-				return 1
-			}
-			return 0
-		}
-		tx, err = db.conn.Begin()
-	)
+	tx, err := db.conn.Begin()
 	if err != nil {
 		return err
 	}
 
-	query := "INSERT INTO " + db.config.MigrationsTable + " (sequence, version, dirty) VALUES ($sequence, $version, $dirty)"
-	if _, err := tx.Exec(query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", bool(dirty))); err != nil {
+	query := `
+	DECLARE $sequence AS UInt64;
+	DECLARE $version AS Int64;
+	DECLARE $dirty AS Bool;
+	INSERT INTO " + db.config.MigrationsTable + " (sequence, version, dirty) VALUES ($sequence, $version, $dirty);
+	`
+
+	if _, err := tx.Exec(query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
@@ -239,7 +237,7 @@ func (db *YDB) ensureVersionTable() (err error) {
 		CREATE TABLE %s (
 			sequence   UInt64,
 			version    Int64,
-			dirty      UInt8,
+			dirty      Bool,
 			PRIMARY KEY(sequence)
 		)`, db.config.MigrationsTable)
 
