@@ -25,16 +25,21 @@ import (
 
 var (
 	certsDirectory = "/tmp/ydb_certs"
+	dataDirectory  = "/tmp/ydb_data"
 
 	opts = dktest.Options{
 		Hostname: "localhost",
 		Env: map[string]string{
-			"YDB_USE_IN_MEMORY_PDISKS": "true",
+			"YDB_LOCAL_SURVIVE_RESTART": "true",
 		},
 		PortBindings: nat.PortMap{
 			nat.Port("2135/tcp"): []nat.PortBinding{{
 				HostIP:   "0.0.0.0",
 				HostPort: "2135",
+			}},
+			nat.Port("8765/tcp"): []nat.PortBinding{{
+				HostIP:   "0.0.0.0",
+				HostPort: "8765",
 			}},
 		},
 		ReadyFunc: isReady,
@@ -43,6 +48,11 @@ var (
 				Type:   mount.TypeBind,
 				Source: certsDirectory,
 				Target: "/ydb_certs",
+			},
+			{
+				Type:   mount.TypeBind,
+				Source: dataDirectory,
+				Target: "/ydb_data",
 			},
 		},
 	}
