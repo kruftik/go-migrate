@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strings"
 	"testing"
 
@@ -39,6 +40,11 @@ var (
 
 	image = "cr.yandex/yc/yandex-docker-local-ydb:latest"
 )
+
+func init() {
+	os.Setenv("YDB_SSL_ROOT_CERTIFICATES_FILE", "/tmp/ydb_certs/ca.pem")
+	os.Setenv("YDB_ANONYMOUS_CREDENTIALS", "1")
+}
 
 func ydbConnectionString(host, port string, options ...string) string {
 	return fmt.Sprintf("grpcs://%s:%s/?%s", host, port, strings.Join(options, "&"))
