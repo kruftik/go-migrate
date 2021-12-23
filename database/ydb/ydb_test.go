@@ -25,8 +25,7 @@ import (
 var (
 	opts = dktest.Options{
 		Env: map[string]string{
-			"YDB_LOCAL_SURVIVE_RESTART": "true",
-			"YDB_USE_IN_MEMORY_PDISKS":  "true",
+			"YDB_USE_IN_MEMORY_PDISKS": "true",
 		},
 		PortBindings: nat.PortMap{
 			nat.Port("2135/tcp"): []nat.PortBinding{{
