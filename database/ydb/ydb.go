@@ -159,7 +159,7 @@ func (db *YDB) Run(r io.Reader) error {
 }
 func (db *YDB) Version() (int, bool, error) {
 	var (
-		sequence uint64
+		sequence int64
 		version  int64
 		dirty    bool
 		query    = "SELECT sequence, version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
@@ -180,13 +180,13 @@ func (db *YDB) SetVersion(version int, dirty bool) error {
 	}
 
 	query := fmt.Sprintf(`
-	DECLARE $sequence AS UInt64;
+	DECLARE $sequence AS Int64;
 	DECLARE $version AS Int64;
 	DECLARE $dirty AS Bool;
 	INSERT INTO %s (sequence, version, dirty) VALUES ($sequence, $version, $dirty);
 	`, db.config.MigrationsTable)
 
-	if _, err := tx.Exec(query, sql.Named("sequence", uint64(time.Now().UnixNano())), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
+	if _, err := tx.Exec(query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
