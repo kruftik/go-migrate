@@ -273,7 +273,7 @@ func (db *YDB) ensureVersionTable() (err error) {
 }
 
 func (db *YDB) Drop() (err error) {
-	query := "SELECT DISTINCT Path FROM `.sys/partition_stats`"
+	query := "SELECT DISTINCT Path FROM `.sys/partition_stats` WHERE Path NOT LIKE '%/.sys%'"
 	tables, err := db.conn.QueryContext(ydbsql.WithScanQuery(context.Background()), query)
 
 	if err != nil {
@@ -285,16 +285,18 @@ func (db *YDB) Drop() (err error) {
 		}
 	}()
 
-	for tables.Next() {
-		var table string
-		if err := tables.Scan(&table); err != nil {
-			return err
-		}
+	for tables.NextResultSet() {
+		for tables.Next() {
+			var table string
+			if err := tables.Scan(&table); err != nil {
+				return err
+			}
 
-		query = "DROP TABLE " + table
+			query = fmt.Sprintf("DROP TABLE `%s`", table)
 
-		if _, err := db.conn.ExecContext(ydbsql.WithSchemeQuery(context.Background()), query); err != nil {
-			return &database.Error{OrigErr: err, Query: []byte(query)}
+			if _, err := db.conn.ExecContext(ydbsql.WithSchemeQuery(context.Background()), query); err != nil {
+				return &database.Error{OrigErr: err, Query: []byte(query)}
+			}
 		}
 	}
 	if err := tables.Err(); err != nil {
