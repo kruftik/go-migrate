@@ -190,8 +190,6 @@ func (db *YDB) SetVersion(version int, dirty bool) error {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
-	time.Sleep(5 * time.Second)
-
 	return tx.Commit()
 }
 
