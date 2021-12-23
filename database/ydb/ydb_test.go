@@ -31,42 +31,31 @@ var (
 	opts = dktest.Options{
 		Hostname: "localhost",
 		Env: map[string]string{
-			"YDB_LOCAL_SURVIVE_RESTART": "true",
+			"YDB_USE_IN_MEMORY_PDISKS": "true",
+			"GRPC_PORT":                "2138",
 		},
 		PortBindings: nat.PortMap{
-			nat.Port("2135/tcp"): []nat.PortBinding{{
+			nat.Port("2138/tcp"): []nat.PortBinding{{
 				HostIP:   "0.0.0.0",
-				HostPort: "2135",
-			}},
-			nat.Port("8765/tcp"): []nat.PortBinding{{
-				HostIP:   "0.0.0.0",
-				HostPort: "8765",
+				HostPort: "2138",
 			}},
 		},
 		ReadyFunc: isReady,
-		Mounts: []mount.Mount{
-			{
-				Type:   mount.TypeBind,
-				Source: certsDirectory,
-				Target: "/ydb_certs",
-			},
-		},
 	}
 
 	image = "cr.yandex/yc/yandex-docker-local-ydb:latest"
 )
 
 func init() {
-	os.Setenv("YDB_SSL_ROOT_CERTIFICATES_FILE", path.Join(certsDirectory, "ca.pem"))
 	os.Setenv("YDB_ANONYMOUS_CREDENTIALS", "1")
 }
 
 func ydbConnectionString(host, port string, options ...string) string {
-	return fmt.Sprintf("grpcs://%s:%s/?%s", host, port, strings.Join(options, "&"))
+	return fmt.Sprintf("grpc://%s:%s/?%s", host, port, strings.Join(options, "&"))
 }
 
 func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
-	db, err := sql.Open("ydb", ydbConnectionString("localhost", "2135", "database=/local"))
+	db, err := sql.Open("ydb", ydbConnectionString("localhost", "2138", "database=/local"))
 	if err != nil {
 		return false
 	}
@@ -90,7 +79,7 @@ func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
 
 func Test(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		addr := ydbConnectionString("localhost", "2135", "database=/local")
+		addr := ydbConnectionString("localhost", "2138", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
@@ -107,7 +96,7 @@ func Test(t *testing.T) {
 
 func TestMigrate(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		addr := ydbConnectionString("localhost", "2135", "database=/local")
+		addr := ydbConnectionString("localhost", "2138", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
@@ -128,7 +117,7 @@ func TestMigrate(t *testing.T) {
 
 func TestMultipleStatements(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		addr := ydbConnectionString("localhost", "2135", "database=/local")
+		addr := ydbConnectionString("localhost", "2138", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
 		if err != nil {
