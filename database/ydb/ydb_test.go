@@ -10,11 +10,9 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
 	"github.com/golang-migrate/migrate/v4"
 
