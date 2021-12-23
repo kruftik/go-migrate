@@ -1,4 +1,4 @@
-module github.com/golang-migrate/migrate/v4
+module github.com/floatdrop/migrate/v4
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
