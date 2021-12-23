@@ -235,7 +235,7 @@ func (db *YDB) ensureVersionTable() (err error) {
 	// if not, create the empty migration table
 	query := fmt.Sprintf(`
 		CREATE TABLE %s (
-			sequence   UInt64,
+			sequence   Int64,
 			version    Int64,
 			dirty      Bool,
 			PRIMARY KEY(sequence)
