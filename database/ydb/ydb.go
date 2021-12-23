@@ -174,7 +174,9 @@ func (db *YDB) Version() (int, bool, error) {
 }
 
 func (db *YDB) SetVersion(version int, dirty bool) error {
-	tx, err := db.conn.Begin()
+	tx, err := db.conn.BeginTx(context.Background(), &sql.TxOptions{
+		Isolation: sql.LevelSerializable,
+	})
 	if err != nil {
 		return err
 	}
