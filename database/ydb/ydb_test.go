@@ -30,7 +30,8 @@ var (
 	certsDirectory = "/tmp/ydb_certs"
 
 	opts = dktest.Options{
-		Hostname: "localhost",
+		ReadyTimeout: 15 * time.Second,
+		Hostname:     "localhost",
 		Env: map[string]string{
 			"YDB_USE_IN_MEMORY_PDISKS": "true",
 		},
@@ -82,14 +83,14 @@ func isReady(ctx context.Context, c dktest.ContainerInfo) bool {
 		return false
 	}
 
+	// Wait for container to bootup
+	time.Sleep(10 * time.Second)
+
 	return true
 }
 
 func Test(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		// Wait for container to bootup
-		time.Sleep(10 * time.Second)
-
 		addr := ydbConnectionString("localhost", "2135", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
@@ -107,9 +108,6 @@ func Test(t *testing.T) {
 
 func TestMigrate(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		// Wait for container to bootup
-		time.Sleep(10 * time.Second)
-
 		addr := ydbConnectionString("localhost", "2135", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
@@ -131,9 +129,6 @@ func TestMigrate(t *testing.T) {
 
 func TestMultipleStatements(t *testing.T) {
 	dktest.Run(t, image, opts, func(t *testing.T, c dktest.ContainerInfo) {
-		// Wait for container to bootup
-		time.Sleep(10 * time.Second)
-
 		addr := ydbConnectionString("localhost", "2135", "database=/local")
 		p := &YDB{}
 		d, err := p.Open(addr)
