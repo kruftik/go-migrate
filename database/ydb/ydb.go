@@ -18,6 +18,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/multistmt"
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/ydb-platform/ydb-go-sdk/v3/table"
 	ydbsql "github.com/ydb-platform/ydb-go-sql"
 )
 
@@ -188,7 +189,12 @@ func (db *YDB) SetVersion(version int, dirty bool) error {
 	INSERT INTO %s (sequence, version, dirty) VALUES ($sequence, $version, $dirty);
 	`, db.config.MigrationsTable)
 
-	if _, err := tx.Exec(query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
+	ctx := ydbsql.WithTxControl(context.Background(), table.TxControl(
+		table.BeginTx(table.WithSerializableReadWrite()),
+		table.CommitTx(),
+	))
+
+	if _, err := tx.ExecContext(ctx, query, sql.Named("sequence", time.Now().UnixNano()), sql.Named("version", int64(version)), sql.Named("dirty", dirty)); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
 
