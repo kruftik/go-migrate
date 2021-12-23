@@ -27,7 +27,6 @@ import (
 
 var (
 	certsDirectory = "/tmp/ydb_certs"
-	dataDirectory  = "/tmp/ydb_data"
 
 	opts = dktest.Options{
 		Hostname: "localhost",
@@ -50,11 +49,6 @@ var (
 				Type:   mount.TypeBind,
 				Source: certsDirectory,
 				Target: "/ydb_certs",
-			},
-			{
-				Type:   mount.TypeBind,
-				Source: dataDirectory,
-				Target: "/ydb_data",
 			},
 		},
 	}
@@ -145,7 +139,7 @@ func TestMultipleStatements(t *testing.T) {
 				t.Error(err)
 			}
 		}()
-		if err := d.Run(strings.NewReader("CREATE TABLE foo (foo Utf8); CREATE TABLE bar (bar Utf8);")); err != nil {
+		if err := d.Run(strings.NewReader("CREATE TABLE foo (foo Utf8 PRIMARY KEY(foo)); CREATE TABLE bar (bar Utf8 PRIMARY KEY(bar));")); err != nil {
 			t.Fatalf("expected err to be nil, got %v", err)
 		}
 
