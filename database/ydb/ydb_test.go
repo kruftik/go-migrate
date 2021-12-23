@@ -13,7 +13,6 @@ import (
 	"path"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
