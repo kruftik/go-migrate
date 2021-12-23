@@ -159,10 +159,10 @@ func (db *YDB) Run(r io.Reader) error {
 }
 func (db *YDB) Version() (int, bool, error) {
 	var (
-		sequence uint64,
-		version int
-		dirty   uint8
-		query   = "SELECT sequence, version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
+		sequence uint64
+		version  int
+		dirty    uint8
+		query    = "SELECT sequence, version, dirty FROM `" + db.config.MigrationsTable + "` ORDER BY sequence DESC LIMIT 1"
 	)
 	if err := db.conn.QueryRow(query).Scan(&sequence, &version, &dirty); err != nil {
 		if err == sql.ErrNoRows {
