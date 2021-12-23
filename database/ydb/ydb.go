@@ -74,7 +74,7 @@ func (db *YDB) Open(dsn string) (database.Driver, error) {
 	}
 
 	q := migrate.FilterCustomQuery(purl)
-	if s := purl.Query().Get("x-use-grpcs-scheme"); len(s) > 0 {
+	if _, ok := purl.Query()["x-use-grpcs-scheme"]; ok {
 		q.Scheme = "grpcs"
 	} else {
 		q.Scheme = "grpc"
@@ -285,20 +285,23 @@ func (db *YDB) Drop() (err error) {
 		}
 	}()
 
-	for tables.NextResultSet() {
-		for tables.Next() {
-			var table string
-			if err := tables.Scan(&table); err != nil {
-				return err
-			}
+	if !tables.NextResultSet() {
+		return nil
+	}
 
-			query = fmt.Sprintf("DROP TABLE `%s`", table)
+	for tables.Next() {
+		var table string
+		if err := tables.Scan(&table); err != nil {
+			return err
+		}
 
-			if _, err := db.conn.ExecContext(ydbsql.WithSchemeQuery(context.Background()), query); err != nil {
-				return &database.Error{OrigErr: err, Query: []byte(query)}
-			}
+		query = fmt.Sprintf("DROP TABLE `%s`", table)
+
+		if _, err := db.conn.ExecContext(ydbsql.WithSchemeQuery(context.Background()), query); err != nil {
+			return &database.Error{OrigErr: err, Query: []byte(query)}
 		}
 	}
+
 	if err := tables.Err(); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
 	}
