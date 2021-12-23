@@ -28,7 +28,7 @@ var (
 	certsDirectory = "/tmp/ydb_certs"
 
 	opts = dktest.Options{
-		ReadyTimeout: 5 * time.Minute,
+		Timeout: 3 * time.Minute
 		Env: map[string]string{
 			"YDB_USE_IN_MEMORY_PDISKS": "true",
 		},
