@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/golang-migrate/migrate/v4/source"
-	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/floatdrop/migrate/v4/source"
+	"github.com/floatdrop/migrate/v4/source/iofs"
 )
 
 func init() {

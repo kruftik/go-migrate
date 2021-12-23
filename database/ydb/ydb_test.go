@@ -17,11 +17,11 @@ import (
 
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
-	"github.com/golang-migrate/migrate/v4"
+	"github.com/floatdrop/migrate/v4"
 
 	"github.com/dhui/dktest"
-	dt "github.com/golang-migrate/migrate/v4/database/testing"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	dt "github.com/floatdrop/migrate/v4/database/testing"
+	_ "github.com/floatdrop/migrate/v4/source/file"
 
 	ydbsql "github.com/ydb-platform/ydb-go-sql"
 )
