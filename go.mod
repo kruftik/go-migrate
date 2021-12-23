@@ -79,4 +79,5 @@ require (
 
 go 1.16
 
-replace github.com/dhui/dktest => github.com/floatdrop/dktest v0.3.9-0.20211223122609-c60ae571a0e7
+// Uncomment for tests
+// replace github.com/dhui/dktest => github.com/floatdrop/dktest v0.3.9-0.20211223122609-c60ae571a0e7
